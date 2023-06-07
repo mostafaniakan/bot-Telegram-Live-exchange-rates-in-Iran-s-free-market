@@ -1,6 +1,7 @@
 <?php
 require 'vendor/autoload.php';
-include 'DB/Conection.php';
+include_once 'DB/Connection.php';
+include_once 'oop/users.php';
 use Goutte\Client;
 
 $results = array();
@@ -20,7 +21,7 @@ $results = array();
     });
 
 
-
+$rate=[];
 $obj =[];
 for ($i = 0; $i + 4 < count($results); $i += 4) {
 
@@ -33,35 +34,9 @@ for ($i = 0; $i + 4 < count($results); $i += 4) {
         ];
     }
 }
-
-//$sql = "INSERT INTO items_users (user_id, value) VALUES (?,?)";
-//$stmt = $db->prepare($sql);
-//$stmt->execute([$chat_id, strtoupper($value
-
-
-
-for ( $x=0;$x<count($obj);$x++){
-    if($obj[$x]['Code']=='EUR'){
-        $sql = "INSERT INTO `rates`( `name`, `buy`, `sell`) VALUES (?,?,?)";
-        $stmt = $db->prepare($sql);
-        $stmt->execute([$obj[$x]['Code'],$obj[$x]['Buy'],$obj[$x]['Sell']]);
-    }
-    if($obj[$x]['Code']=='USD'){
-        $sql = "INSERT INTO `rates`( `name`, `buy`, `sell`) VALUES (?,?,?)";
-        $stmt = $db->prepare($sql);
-        $stmt->execute([$obj[$x]['Code'],$obj[$x]['Buy'],$obj[$x]['Sell']]);
-
-    }
-    if($obj[$x]['Code']=='GBP'){
-        $sql = "INSERT INTO `rates`( `name`, `buy`, `sell`) VALUES (?,?,?)";
-        $stmt = $db->prepare($sql);
-        $stmt->execute([$obj[$x]['Code'],$obj[$x]['Buy'],$obj[$x]['Sell']]);
-
-    }
-    if($obj[$x]['Code']=='AUD'){
-        $sql = "INSERT INTO `rates`( `name`, `buy`, `sell`) VALUES (?,?,?)";
-        $stmt = $db->prepare($sql);
-        $stmt->execute([$obj[$x]['Code'],$obj[$x]['Buy'],$obj[$x]['Sell']]);
+foreach ($obj as $item){
+    if($item['Code'] == 'USD' || $item['Code'] == 'EUR' || $item['Code'] == 'GBP' || $item['Code'] == 'AUD'){
+        $rate[] = $item;
     }
 }
-return $obj;
+return $rate;
