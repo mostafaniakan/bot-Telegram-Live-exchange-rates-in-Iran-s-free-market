@@ -1,44 +1,91 @@
 <?php
 
 namespace oop;
+
+use PDO;
+
 class methods
 {
-    function bot($method, $datas = [])
-    {
-        $url = "https://api.telegram.org/bot" . token . "/" . $method;
 
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $datas);
-        $res = curl_exec($ch);
-        if (curl_error($ch)) {
-            var_dump(curl_error($ch));
-        } else {
-            json_decode($res);
-        }
-    }
+
     public function sendmessage($chat_id, $text)
     {
-        $this->bot('sendMessage', [
+        $data = bot('sendMessage', [
             'chat_id' => $chat_id,
             'text' => $text,
             'parse_mode' => 'MarkDown'
         ]);
+        return $data;
     }
-    public function showRate($chat_id,$obj,$row){
-        $this->sendmessage($chat_id, 'Name : ' . $obj[$row]['Code']."=>". 'Buy : ' . $obj[$row]['Buy'] ."=>". 'Sell : ' . $obj[$row]['Sell']);
-//       $this->sendmessage($chat_id, 'Buy : ' . $obj[$row]['Buy']);
-//       $this->sendmessage($chat_id, 'Sell : ' . $obj[$row]['Sell']);
+
+    public function showRate($chat_id, $obj, $row)
+    {
+        $data = $this->sendmessage($chat_id, 'Name : ' . $obj[$row]['Code'] . "=>" . 'Buy : ' . $obj[$row]['Buy'] . "=>" . 'Sell : ' . $obj[$row]['Sell']);
+        return $data;
     }
-    public function showRateUp($chat_id,$obj,$row){
-        $this->sendmessage($chat_id, 'Name : ' . $obj[$row]['Code'] . " => ". 'Buy : ' . $obj[$row]['Buy'] .'🟢' . " => " . 'Sell : ' . $obj[$row]['Sell'] . '🔴');
-//        $this->sendmessage($chat_id, 'Buy : ' . $obj[$row]['Buy'] .'🟢');
-//        $this->sendmessage($chat_id, 'Sell : ' . $obj[$row]['Sell'] . '🔴');
+
+    public function showRateUp($chat_id, $obj, $row)
+    {
+        $data=$this->sendmessage($chat_id, 'Name : ' . $obj[$row]['Code'] . " => " . 'Buy : ' . $obj[$row]['Buy'] . '🟢' . " => " . 'Sell : ' . $obj[$row]['Sell'] . '🔴');
+    return $data;
     }
-    public function showRatedown($chat_id,$obj,$row){
-        $this->sendmessage($chat_id, 'Name : ' . $obj[$row]['Code'] . " => ". 'Buy : ' . $obj[$row]['Buy'] .'🔴' . " => " . 'Sell : ' . $obj[$row]['Sell'] . '🟢');
-//        $this->sendmessage($chat_id, 'Buy : ' . $obj[$row]['Buy'] . '🔴');
-//        $this->sendmessage($chat_id, 'Sell : ' . $obj[$row]['Sell'] . '🟢' );
+
+    public function showRateDown($chat_id, $obj, $row)
+    {
+        $data=$this->sendmessage($chat_id, 'Name : ' . $obj[$row]['Code'] . " => " . 'Buy : ' . $obj[$row]['Buy'] . '🔴' . " => " . 'Sell : ' . $obj[$row]['Sell'] . '🟢');
+
+    return $data;
+    }
+
+
+    public function updateText($chat_id, $message_id, $text)
+    {
+        bot('editMessageText', [
+            'chat_id' => $chat_id,
+            'text' => $text,
+            'message_id' => $message_id
+        ]);
+    }
+
+    public function updateButtonId($db, $message_id)
+    {
+        $sql = "UPDATE `button_id` SET `button_id`='$message_id' WHERE `id` = 1";
+        $stmt = $db->query($sql);
+        $config = $stmt->rowCount();
+        return $config;
+    }
+
+    public function getButtonId($db)
+    {
+        $sql = "SELECT `id`, `button_id` FROM `button_id` WHERE `id`=1;";
+        $stmt = $db->query($sql);
+        $config = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $config['button_id'];
+    }
+
+
+    public function updateMessageId($db, $message_id)
+    {
+        $sql = "UPDATE `message_id` SET `message_id`='$message_id' WHERE `id` = 1";
+        $stmt = $db->query($sql);
+        $config = $stmt->rowCount();
+        return $config;
+    }
+
+    public function getMessageId($db)
+    {
+        $sql = "SELECT `id`, `message_id` FROM `message_id` WHERE `id`=1;";
+        $stmt = $db->query($sql);
+        $config = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $config['message_id'];
+    }
+
+
+    public function insertMessageId($db, $message_id)
+    {
+        $sql = "INSERT INTO `message_id`( `message_id`) VALUES ('$message_id')";
+        $stmt = $db->query($sql);
+        $config = $stmt->rowCount();
+        return $config;
     }
 }

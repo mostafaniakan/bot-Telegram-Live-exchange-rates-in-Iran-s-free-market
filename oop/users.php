@@ -8,6 +8,7 @@ class users
 {
     public function checkUserId($db, $chat_id)
     {
+
         $sql = "SELECT `users_id` FROM `users` WHERE `users_id` = '$chat_id'";
         $stmt = $db->query($sql);
         $config = $stmt->rowCount();
@@ -20,22 +21,26 @@ class users
         $stmt = $db->query($sql);
         $stmt->rowCount();
     }
-    public function getUserRates($db){
-        $data=[];
-        $sql="SELECT * FROM `items_users` JOIN `rates` ON items_users.value = rates.name";
+
+    public function getUserRates($db)
+    {
+        $data = [];
+        $sql = "SELECT * FROM `items_users` JOIN `rates` ON items_users.value = rates.name";
         $stmt = $db->query($sql);
-        $row=$stmt->rowCount();
-        if($row >0){
+        $row = $stmt->rowCount();
+        if ($row > 0) {
             while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-               array_push($data,$row);
+                array_push($data, $row);
             }
         }
-       return $data;
+        return $data;
     }
-    public function updateRate($db,$id,$buy,$sell){
-        $sql="UPDATE `rates` SET `buy`='$buy',`sell`='$sell' WHERE  `id` = $id";
+
+    public function updateRate($db, $id, $buy, $sell)
+    {
+        $sql = "UPDATE `rates` SET `buy`='$buy',`sell`='$sell' WHERE  `id` = $id";
         $stmt = $db->query($sql);
-        $config=$stmt->rowCount();
+        $config = $stmt->rowCount();
         return $config;
     }
 }

@@ -2,9 +2,14 @@
 
 namespace oop;
 
+
+include_once('users.php');
+include_once('methods.php');
+
 class btn
 {
-    public function inlineKeyboards($token, $chat_id, $text, $callback_data, $message)
+
+    public function inlineKeyboards($chat_id, $text, $callback_data, $message)
     {
 
         $keyboard = json_encode([
@@ -21,21 +26,31 @@ class btn
 
         ]);
 
-        $data = http_build_query([
+
+        bot('sendMessage', [
+            'reply_markup' => $keyboard,
             'text' => $message,
-            'chat_id' => $chat_id,
+            'chat_id' => $chat_id
         ]);
 
-        $url = "https://api.telegram.org/bot" . $token . "/sendMessage?{$data}&reply_markup={$keyboard}";
-        $res = @file_get_contents($url);
     }
 
-    public function customKeyboard($token, $chat_id, $message)
+    public function customKeyboard($chat_id, $message)
     {
+
+
+        $btn1 = "USD";
+        $btn2 = "EUR";
+        $btn3 = "GBP";
+        $btn4 = "AUD";
+        $setting = "setting⚙️";
+
         $keyboard = [
+
             'keyboard' => [
-                ['USD', 'EUR '],
-                ['GBP', 'AUD'],
+                [$btn1, $btn2],
+                [$btn3, $btn4],
+                [$setting],
             ],
             'resize_keyboard' => true,
             'one_time_keyboard' => false,
@@ -43,7 +58,12 @@ class btn
 
         $encodedKeyboard = json_encode($keyboard);
         $open = $message;
-        file_get_contents("https://api.telegram.org/bot" . $token . "/sendMessage?chat_id=" . $chat_id . "&text=" . $open . "&reply_markup=" . $encodedKeyboard);
+        bot('sendMessage', [
+            'chat_id' => $chat_id,
+            'text' => $open,
+            'reply_markup' => $encodedKeyboard
+
+        ]);
     }
 
     public function getPhoneNumber($token, $chat_id)
@@ -66,19 +86,98 @@ class btn
             'resize_keyboard' => true,
         ]);
 
-// The Telegram API URL
-        $url = "https://api.telegram.org/bot$token/sendMessage";
 
-// The data to send to the API
-        $data = [
+        bot('sendMessage', [
             'chat_id' => $chat_id,
             'text' => $text,
             'reply_markup' => $reply_markup,
-        ];
+        ]);
 
-// Send the message to the API
-         file_get_contents($url . '?' . http_build_query($data));
+    }
 
+
+    public function AddradioButton($db, $chat_id, $message_id, $text)
+    {
+        $btn1 = "USD";
+        $btn2 = "EUR";
+        $btn3 = "GBP";
+        $btn4 = "AUD";
+        $callback_data1 = "AddUSD";
+        $callback_data2 = "AddEUR";
+        $callback_data3 = "AddGBP";
+        $callback_data4 = "AddAUD";
+
+        $user = new users();
+        $rate = $user->getUserRates($db);
+        foreach ($rate as $item) {
+            if ($item['name'] == 'USD') {
+                $btn1 = "USD✔️";
+                $callback_data1 = "DeleteUSD";
+            }
+            if ($item['name'] == 'EUR') {
+                $btn2 = "EUR✔️";
+                $callback_data2 = "DeleteEUR";
+            }
+            if ($item['name'] == 'GBP') {
+                $btn3 = "GBP✔️";
+                $callback_data3 = "DeleteGBP";
+            }
+            if ($item['name'] == 'AUD') {
+                $btn4 = "AUD✔️";
+                $callback_data4 = "DeleteAUD";
+            }
+        }
+        $keyboard = json_encode([
+            "inline_keyboard" => [
+                [
+                    ['text' => $btn1, 'callback_data' => $callback_data1],
+                    ['text' => $btn2, 'callback_data' => $callback_data2],
+                ],
+                [
+                    ['text' => $btn3, 'callback_data' => $callback_data3],
+                    ['text' => $btn4, 'callback_data' => $callback_data4],
+                ]
+            ]
+        ]);
+
+        bot('editMessageText', [
+            'chat_id' => $chat_id,
+            'text' => $text,
+            'message_id' => $message_id
+        ]);
+        bot('editMessageReplyMarkup', [
+            'chat_id' => $chat_id,
+            'message_id' => $message_id,
+            'reply_markup' => $keyboard
+        ]);
+
+    }
+
+    public function SettingradioButton($db, $chat_id, $text)
+    {
+        $methods = new methods();
+        $btn1 = "Add";
+        $btn2 = "Delete";
+        $keyboard = json_encode([
+            "inline_keyboard" => [
+                [
+                    ['text' => $btn1, 'callback_data' => 'AddRate'],
+                ],
+
+            ]
+        ]);
+
+
+        $data = bot('sendMessage', [
+            'chat_id' => $chat_id,
+            'text' => $text,
+            'reply_markup' => $keyboard
+        ]);
+        $methods->updateButtonId($db, $data->result->message_id);
+    }
+
+    public function DeleteRadioButton($db, $id)
+    {
 
     }
 }

@@ -3,16 +3,15 @@
 namespace oop;
 
 
-
-
 include('DB/Connection.php');
 include('scraping.php');
-include_once ('users.php');
-include_once ('methods.php');
+include_once('users.php');
+include_once('methods.php');
+
 class updateRates
 {
 
-    public function updateRates($db,$rate,$obj,$chat_id)
+    public function updateRates($db, $rate, $obj, $chat_id)
     {
 
         $user = new users();
@@ -24,13 +23,13 @@ class updateRates
                     if ($rate[$x]['buy'] == $obj[$i]['Buy'] && $rate[$x]['sell'] == $obj[$i]['Sell']) {
 
                     } else {
-                         if($rate[$x]['buy'] < $obj[$i]['Buy']){
-                             $user->updateRate($db, $rate[$x]['id'], $obj[$i]['Buy'], $obj[$i]['Sell']);
-                             $methods->showRateUp($chat_id, $obj, $i);
-                         }else{
-                             $user->updateRate($db, $rate[$x]['id'], $obj[$i]['Buy'], $obj[$i]['Sell']);
-                             $methods->showRatedown($chat_id, $obj,$i);
-                         }
+                        if ($rate[$x]['buy'] < $obj[$i]['Buy']) {
+                            $user->updateRate($db, $rate[$x]['id'], $obj[$i]['Buy'], $obj[$i]['Sell']);
+                            $methods->showRateUp($chat_id, $obj, $i);
+                        } else {
+                            $user->updateRate($db, $rate[$x]['id'], $obj[$i]['Buy'], $obj[$i]['Sell']);
+                            $methods->showRateDown($chat_id, $obj, $i);
+                        }
                     }
                 }
             }
@@ -44,8 +43,13 @@ class updateRates
                     if ($rate[$x]['buy'] == $obj[$i]['Buy'] && $rate[$x]['sell'] == $obj[$i]['Sell']) {
 
                     } else {
-                         $user->updateRate($db, $rate[$x]['id'], $obj[$i]['Buy'], $obj[$i]['Sell']);
-                        $methods->showRate($chat_id, $obj, $i);
+                        if ($rate[$x]['buy'] < $obj[$i]['Buy']) {
+                            $user->updateRate($db, $rate[$x]['id'], $obj[$i]['Buy'], $obj[$i]['Sell']);
+                            $methods->showRateUp($chat_id, $obj, $i);
+                        } else {
+                            $user->updateRate($db, $rate[$x]['id'], $obj[$i]['Buy'], $obj[$i]['Sell']);
+                            $methods->showRateDown($chat_id, $obj, $i);
+                        }
                     }
                 }
             }
@@ -58,8 +62,13 @@ class updateRates
                     if ($rate[$x]['buy'] == $obj[$i]['Buy'] && $rate[$x]['sell'] == $obj[$i]['Sell']) {
 
                     } else {
-                        $user->updateRate($db, $rate[$x]['id'], $obj[$i]['Buy'], $obj[$i]['Sell']);
-                        $methods->showRate($chat_id, $obj, $i);
+                        if ($rate[$x]['buy'] < $obj[$i]['Buy']) {
+                            $user->updateRate($db, $rate[$x]['id'], $obj[$i]['Buy'], $obj[$i]['Sell']);
+                            $methods->showRateUp($chat_id, $obj, $i);
+                        } else {
+                            $user->updateRate($db, $rate[$x]['id'], $obj[$i]['Buy'], $obj[$i]['Sell']);
+                            $methods->showRateDown($chat_id, $obj, $i);
+                        }
                     }
                 }
             }
@@ -72,15 +81,20 @@ class updateRates
                     if ($rate[$x]['buy'] == $obj[$i]['Buy'] && $rate[$x]['sell'] == $obj[$i]['Sell']) {
 
                     } else {
-                         $user->updateRate($db, $rate[$x]['id'], $obj[$i]['Buy'], $obj[$i]['Sell']);
-                        $methods->showRate($chat_id, $obj, $i);
+                        if ($rate[$x]['buy'] < $obj[$i]['Buy']) {
+                            $user->updateRate($db, $rate[$x]['id'], $obj[$i]['Buy'], $obj[$i]['Sell']);
+                            $methods->showRateUp($chat_id, $obj, $i);
+                        } else {
+                            $user->updateRate($db, $rate[$x]['id'], $obj[$i]['Buy'], $obj[$i]['Sell']);
+                            $methods->showRateDown($chat_id, $obj, $i);
+                        }
                     }
                 }
             }
 
         }
-    }
 
+    }
 
 
 }
