@@ -29,7 +29,7 @@ file_put_contents('data.json', $update);
 $data = json_decode($update);
 
 const token = "6135478668:AAGOHriJ3vZl0XaDy-DlxzjzVxodqhn5hdQ";
-
+$webhook_url = 'https://558f-185-107-81-154.ngrok-free.app';
 
 //config bot
 function bot($method, $datas = [])
@@ -44,6 +44,30 @@ function bot($method, $datas = [])
     $dataBot = json_decode($res);
     return $dataBot;
 }
+
+
+
+
+//set webhook
+$url = "https://api.telegram.org/bot".token."/setWebhook?url=$webhook_url";
+
+$ch = curl_init();
+curl_setopt($ch, CURLOPT_URL, $url);
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+$result = curl_exec($ch);
+
+if ($result === false) {
+    echo 'Error: ' . curl_error($ch);
+} else {
+    echo 'Webhook set up successfully';
+}
+curl_close($ch);
+
+if (php_sapi_name() == 'cli-server') {
+    $update = file_get_contents('php://input');
+}
+
 
 //get user id
 $chat_id = 0;
@@ -83,6 +107,7 @@ if (isset($data->message->contact->phone_number)) {
     $phone = $data->message->contact->phone_number;
 }
 
+//set webhook
 
 if ($value == '/start') {
 
@@ -285,9 +310,10 @@ if ($value == 'setting' || $value == 'تنظیمات') {
 }
 
 if ($value == "AddRate") {
-    $button_id = $methods->getButtonId($db);
     $language = $methods->getLanguage($db, $chat_id);
+    $button_id = $methods->getButtonId($db);
     if ($language == 'ENGLISH') {
+
         $btn->AddradioButton($db, $chat_id, $button_id, '<b><i>SELECT✔  OR DELETE</i></b>');
     } else if ('PERSIAN') {
         $btn->AddradioButton($db, $chat_id, $button_id, '<b><i>انتخاب✔  و  حذف</i></b>');
@@ -309,8 +335,9 @@ if ($value == 'AddUSD' || $value == 'AddEUR' || $value == 'AddGBP' || $value == 
         $config = $stmt->fetch(PDO::FETCH_ASSOC);
 
     }
-    $message_id = $methods->getButtonId($db);
+
     $language = $methods->getLanguage($db, $chat_id);
+    $button_id = $methods->getButtonId($db);
     if ($language == 'ENGLISH') {
         $btn->AddradioButton($db, $chat_id, $button_id, '<b><i>SELECT✔  OR DELETE</i></b>');
     } else if ('PERSIAN') {
@@ -330,8 +357,8 @@ if ($value == 'DeleteUSD' || $value == 'DeleteEUR' || $value == 'DeleteGBP' || $
     $stmt = $db->query($sql);
     $config = $stmt->rowCount();
 
-    $message_id = $methods->getButtonId($db);
     $language = $methods->getLanguage($db, $chat_id);
+    $button_id = $methods->getButtonId($db);
     if ($language == 'ENGLISH') {
         $btn->AddradioButton($db, $chat_id, $button_id, '<b><i>SELECT✔  OR DELETE</i></b>');
     } else if ('PERSIAN') {
