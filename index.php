@@ -6,6 +6,7 @@ use oop\methods;
 use oop\updateRates;
 use oop\users;
 
+//connection
 include('DB/Connection.php');
 include('scraping.php');
 include_once('oop/updateRates.php');
