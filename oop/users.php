@@ -22,10 +22,10 @@ class users
         $stmt->rowCount();
     }
 
-    public function getUserRates($db)
+    public function getUserRates($db,$chat_id)
     {
         $data = [];
-        $sql = "SELECT * FROM `items_users` JOIN `rates` ON items_users.value = rates.name";
+        $sql = "SELECT * FROM `items_users` JOIN `rates` ON items_users.value = rates.name WHERE `user_id` = '$chat_id'";
         $stmt = $db->query($sql);
         $row = $stmt->rowCount();
         if ($row > 0) {

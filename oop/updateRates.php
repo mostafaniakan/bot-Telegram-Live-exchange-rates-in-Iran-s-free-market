@@ -5,6 +5,7 @@ namespace oop;
 
 include('DB/Connection.php');
 include('scraping.php');
+
 include_once('users.php');
 include_once('methods.php');
 
@@ -19,11 +20,15 @@ class updateRates
 
         for ($x = 0; $x < count($rate); $x++) {
             for ($i = 0; $i < count($obj); $i++) {
+
                 if ($rate[$x]['name'] == 'USD' && $obj[$i]['Code'] == 'USD') {
+
+
                     if ($rate[$x]['buy'] == $obj[$i]['Buy'] && $rate[$x]['sell'] == $obj[$i]['Sell']) {
 
                     } else {
                         if ($rate[$x]['buy'] < $obj[$i]['Buy']) {
+
                             $user->updateRate($db, $rate[$x]['id'], $obj[$i]['Buy'], $obj[$i]['Sell']);
                             $methods->showRateUp($chat_id, $obj, $i);
                         } else {

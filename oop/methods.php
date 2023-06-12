@@ -13,28 +13,29 @@ class methods
         $data = bot('sendMessage', [
             'chat_id' => $chat_id,
             'text' => $text,
-            'parse_mode' => 'MarkDown'
+            'parse_mode' => 'html'
         ]);
         return $data;
     }
 
     public function showRate($chat_id, $obj, $row)
     {
-        $data = $this->sendmessage($chat_id, 'Name : ' . $obj[$row]['Code'] . "=>" . 'Buy : ' . $obj[$row]['Buy'] . "=>" . 'Sell : ' . $obj[$row]['Sell']);
+        $data = $this->sendmessage($chat_id, 'نام : ' . $obj[$row]['Code'] . "=>" . 'خرید : ' . $obj[$row]['Buy'] . "=>" . 'فروش : ' . $obj[$row]['Sell']);
         return $data;
     }
 
     public function showRateUp($chat_id, $obj, $row)
     {
-        $data=$this->sendmessage($chat_id, 'Name : ' . $obj[$row]['Code'] . " => " . 'Buy : ' . $obj[$row]['Buy'] . '🟢' . " => " . 'Sell : ' . $obj[$row]['Sell'] . '🔴');
-    return $data;
+
+        $data = $this->sendmessage($chat_id, 'نام : ' . $obj[$row]['Code'] . " => " . 'خرید : ' . $obj[$row]['Buy'] . '🟢' . " => " . 'فروش : ' . $obj[$row]['Sell'] . '🔴');
+        return $data;
     }
 
     public function showRateDown($chat_id, $obj, $row)
     {
-        $data=$this->sendmessage($chat_id, 'Name : ' . $obj[$row]['Code'] . " => " . 'Buy : ' . $obj[$row]['Buy'] . '🔴' . " => " . 'Sell : ' . $obj[$row]['Sell'] . '🟢');
+        $data = $this->sendmessage($chat_id, 'نام : ' . $obj[$row]['Code'] . " => " . 'خرید : ' . $obj[$row]['Buy'] . '🔴' . " => " . 'فروش : ' . $obj[$row]['Sell'] . '🟢');
 
-    return $data;
+        return $data;
     }
 
 

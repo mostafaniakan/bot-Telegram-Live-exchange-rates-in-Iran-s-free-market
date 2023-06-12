@@ -61,14 +61,15 @@ class btn
         bot('sendMessage', [
             'chat_id' => $chat_id,
             'text' => $open,
-            'reply_markup' => $encodedKeyboard
+            'reply_markup' => $encodedKeyboard,
+            'parse_mode' => 'html',
 
         ]);
     }
 
-    public function getPhoneNumber($token, $chat_id)
+    public function getPhoneNumber($text, $chat_id)
     {
-        $text = 'Please select share contact :';
+
 
 // The keyboard with the "Share Contact" button
         $reply_markup = json_encode([
@@ -91,6 +92,7 @@ class btn
             'chat_id' => $chat_id,
             'text' => $text,
             'reply_markup' => $reply_markup,
+            'parse_mode' => 'html',
         ]);
 
     }
@@ -108,7 +110,7 @@ class btn
         $callback_data4 = "AddAUD";
 
         $user = new users();
-        $rate = $user->getUserRates($db);
+        $rate = $user->getUserRates($db,$chat_id);
         foreach ($rate as $item) {
             if ($item['name'] == 'USD') {
                 $btn1 = "USD✔️";
@@ -143,12 +145,14 @@ class btn
         bot('editMessageText', [
             'chat_id' => $chat_id,
             'text' => $text,
-            'message_id' => $message_id
+            'message_id' => $message_id,
+            'parse_mode' => 'html'
         ]);
         bot('editMessageReplyMarkup', [
             'chat_id' => $chat_id,
             'message_id' => $message_id,
-            'reply_markup' => $keyboard
+            'reply_markup' => $keyboard,
+             'parse_mode' => 'html'
         ]);
 
     }
@@ -156,8 +160,7 @@ class btn
     public function SettingradioButton($db, $chat_id, $text)
     {
         $methods = new methods();
-        $btn1 = "Add";
-        $btn2 = "Delete";
+        $btn1 = "انتخاب";
         $keyboard = json_encode([
             "inline_keyboard" => [
                 [
@@ -171,7 +174,8 @@ class btn
         $data = bot('sendMessage', [
             'chat_id' => $chat_id,
             'text' => $text,
-            'reply_markup' => $keyboard
+            'reply_markup' => $keyboard,
+            'parse_mode' => 'html',
         ]);
         $methods->updateButtonId($db, $data->result->message_id);
     }

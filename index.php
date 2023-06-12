@@ -40,33 +40,35 @@ function bot($method, $datas = [])
     $res = curl_exec($ch);
     $dataBot = json_decode($res);
     return $dataBot;
-
-
 }
 
 
+$chat_id=0;
+if (isset($data->callback_query->from->id)) {
+    $chat_id = $data->callback_query->from->id;
+    $updateArray = json_decode($update, true);
+
+}
 //variable
 $db = $db;
 $obj = $obj;
 $value = "";
-$rate = $user->getUserRates($db);
+
 $flag = false;
 
 
 if (isset($data->message->from->id)) {
     $chat_id = $data->message->from->id;
     $updateArray = json_decode($update, true);
-
 }
+
+$rate = $user->getUserRates($db,$chat_id);
+
 if (isset($data->message->text)) {
     $value = $data->message->text;
 }
 
-if (isset($data->callback_query->from->id)) {
-    $chat_id = $data->callback_query->from->id;
-    $updateArray = json_decode($update, true);
 
-}
 if (isset($data->callback_query->data)) {
     $value = $data->callback_query->data;
 }
@@ -81,25 +83,67 @@ if (isset($data->message->contact->phone_number)) {
 if ($value == '/start') {
     $checkUser = $user->checkUserId($db, $chat_id);
     if ($checkUser == 0) {
-        $methods->sendmessage($chat_id, '
-        به ربات مشاهده نرخ زنده ارز
-                 در بازار آزاد ایران خوش آمدین 🌹');
-        $btn->inlineKeyboards($chat_id, 'Create Account', 'createUser', 'pleas Create Account',);
+        $text='';
+
+//        center
+//        $text = "&#8203;$text&#8203;";
+
+        $text=$methods->sendmessage($chat_id, '
+<pre>به ربات مشاهده نرخ زنده 
+ارزدر بازار آزاد ایران خوش آمدین 🌹
+</pre>');
+
+        $btn->inlineKeyboards($chat_id, 'ثبت نام', 'createUser', 'لطفا ثبت نام کنید👇 ',);
     } else {
-        $btn->customKeyboard($chat_id, 'Please select an item');
+        $btn->customKeyboard($chat_id, '<pre>
+در این قسمت شما میتوانید با انتخاب
+ 
+ هر ارز قیمت لحظه ای آن را
+
+ مشاهده کنید.
+ 
+و برای ارسال خودکار قیمت ارز 
+
+میتوانید از قسمت setting ⚙️ ارز خود 
+
+را انتخاب کنید  
+</pre>');
     }
 }
 
 
 if ($value == 'createUser') {
     if (isset($chat_id)) {
-        $btn->getPhoneNumber(token, $chat_id);
+        $btn->getPhoneNumber( '<pre>در این قسمت Share Contact را انتخاب کنید تا احراز هویت شما تکمیل شود 
+
+👇
+</pre> ',$chat_id);
     }
 }
 
 if (isset($phone)) {
     $user->createAcount($db, $chat_id, $username, $phone);
-    $btn->customKeyboard($chat_id, 'Please select an item');
+    $btn->customKeyboard($chat_id, '
+<pre>
+             🌹🌹🌼🌹🌹
+               
+سپاس که مارو انتخاب کردین 
+
+در این قسمت شما میتوانید با انتخاب
+ 
+ هر ارز قیمت لحظه ای آن را
+
+ مشاهده کنید.
+ 
+و برای ارسال خودکار قیمت ارز 
+
+میتوانید از قسمت setting ⚙️ ارز خود 
+
+را انتخاب کنید  
+</pre>'
+    );
+
+
 }
 
 
@@ -124,17 +168,17 @@ if (isset($checkUser)) {
                             $flag = true;
                             if ($obj[$i]['Buy'] > $rate[$x]['buy']) {
                                 $methods->showRateUp($chat_id, $obj, $i);
-                                $getRateId = $user->getUserRates($db);
+                                $getRateId = $user->getUserRates($db,$chat_id);
                                 $user->updateRate($db, $getRateId[$x]['id'], $obj[$i]['Buy'], $obj[$i]['Sell']);
 
                             } else if ($obj[$i]['Buy'] < $rate[$x]['buy']) {
                                 $methods->showRateDown($chat_id, $obj, $i);
-                                $getRateId = $user->getUserRates($db);
+                                $getRateId = $user->getUserRates($db,$chat_id);
                                 $user->updateRate($db, $getRateId[$x]['id'], $obj[$i]['Buy'], $obj[$i]['Sell']);
 
                             } else {
                                 $methods->showRate($chat_id, $obj, $i);
-                                $getRateId = $user->getUserRates($db);
+                                $getRateId = $user->getUserRates($db,$chat_id);
                                 $user->updateRate($db, $getRateId[$x]['id'], $obj[$i]['Buy'], $obj[$i]['Sell']);
 
                             }
@@ -153,12 +197,12 @@ if (isset($checkUser)) {
 }
 
 if ($value == 'setting') {
-    $btn->SettingradioButton($db, $chat_id, 'Automatic notification');
+    $btn->SettingradioButton($db, $chat_id, '<b><i> انتخاب ارز 👇</i></b>');
 }
 
 if ($value == "AddRate") {
     $button_id = $methods->getButtonId($db);
-    $btn->AddradioButton($db, $chat_id, $button_id, "Add && Delete");
+    $btn->AddradioButton($db, $chat_id, $button_id, '<b><i>انتخاب✔  و  حذف</i></b>');
 }
 
 
@@ -177,7 +221,7 @@ if ($value == 'AddUSD' || $value == 'AddEUR' || $value == 'AddGBP' || $value == 
 
     }
     $message_id = $methods->getButtonId($db);
-    $btn->AddradioButton($db, $chat_id, $message_id, "Add && Delete");
+    $btn->AddradioButton($db, $chat_id, $message_id, '<b><i>انتخاب✔  و  حذف</i></b>');
 }
 
 if ($value == 'DeleteUSD' || $value == 'DeleteEUR' || $value == 'DeleteGBP' || $value == 'DeleteAUD') {
@@ -194,18 +238,12 @@ if ($value == 'DeleteUSD' || $value == 'DeleteEUR' || $value == 'DeleteGBP' || $
         $config = $stmt->rowCount();
 
     $message_id = $methods->getButtonId($db);
-    $btn->AddradioButton($db, $chat_id, $message_id, "Add && Delete");
-}
-if ($value == "DeleteRate") {
-    $btn->DeleteRadioButton($db, $chat_id, token, "DELETE ITEM");
+    $btn->AddradioButton($db, $chat_id, $message_id, '<b><i>انتخاب✔  و  حذف</i></b>');
 }
 
 
-
-
-
-
-
+//
+//
 //
 //if (isset($chat_id)) {
 //    $checkUser = $user->checkUserId($db, $chat_id);
@@ -215,7 +253,7 @@ if ($value == "DeleteRate") {
 //        $updateRate->updateRates($db, $rate, $obj, $chat_id);
 //    }
 //}
-
-
+//
+//
 
 
