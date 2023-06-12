@@ -1,5 +1,6 @@
 <?php
 
+//CONFIG
 use oop\btn;
 use oop\methods;
 use oop\updateRates;
@@ -29,6 +30,7 @@ $data = json_decode($update);
 const token = "6135478668:AAGOHriJ3vZl0XaDy-DlxzjzVxodqhn5hdQ";
 
 
+//config bot
 function bot($method, $datas = [])
 {
     $url = "https://api.telegram.org/bot" . token . "/" . $method;
@@ -42,13 +44,13 @@ function bot($method, $datas = [])
     return $dataBot;
 }
 
-
-$chat_id=0;
+//get user id
+$chat_id = 0;
 if (isset($data->callback_query->from->id)) {
     $chat_id = $data->callback_query->from->id;
     $updateArray = json_decode($update, true);
-
 }
+
 //variable
 $db = $db;
 $obj = $obj;
@@ -56,96 +58,180 @@ $value = "";
 
 $flag = false;
 
-
+//get user id
 if (isset($data->message->from->id)) {
     $chat_id = $data->message->from->id;
     $updateArray = json_decode($update, true);
 }
 
-$rate = $user->getUserRates($db,$chat_id);
+$rate = $user->getUserRates($db, $chat_id);
 
 if (isset($data->message->text)) {
     $value = $data->message->text;
 }
 
-
 if (isset($data->callback_query->data)) {
     $value = $data->callback_query->data;
 }
+
 if (isset($data->message->from->username)) {
     $username = $data->message->from->username;
 }
+
 if (isset($data->message->contact->phone_number)) {
     $phone = $data->message->contact->phone_number;
 }
 
 
 if ($value == '/start') {
+
+    $userID = $user->checkUserId($db, $chat_id);
+    if ($userID == 0) {
+        $language = $methods->getLanguageFirst($db, $chat_id);
+        if ($language == null) {
+            $btn->selectLanguageFirst($db, $chat_id);
+        }
+
+    } else {
+        $language = $methods->getLanguage($db, $chat_id);
+    }
+
+}
+
+if ($value == "firstENGLISH" || $value == 'firstPERSIAN') {
+
+    $value = str_replace("first", "", $value);
+    $language = $value;
+    $methods->insertLanguageFirst($db, $chat_id, $language);
+
+}
+
+
+if (isset($language) && $language == 'ENGLISH') {
+
+    $checkUser = $user->checkUserId($db, $chat_id);
+
+    if ($checkUser == 0) {
+
+        $text = $methods->sendmessage($chat_id, '
+    <pre>Welcome to the robot for viewing the live
+exchange rate in Iran s free market 🌹
+    </pre>');
+
+        $btn->inlineKeyboards($chat_id, 'Register', 'createUser', 'Please register 👇 ',);
+    } else {
+        $btn->customKeyboard($db, $chat_id, '<pre>
+In this section you can choose
+
+Each currency has its current price view
+
+And to automatically send currency prices
+
+You can change your currency from the SETTING⚙️  section
+
+Choose
+</pre>');
+    }
+
+
+} else if (isset($language) && $language == 'PERSIAN') {
+
     $checkUser = $user->checkUserId($db, $chat_id);
     if ($checkUser == 0) {
-        $text='';
 
-//        center
-//        $text = "&#8203;$text&#8203;";
-
-        $text=$methods->sendmessage($chat_id, '
-<pre>به ربات مشاهده نرخ زنده 
+        $text = $methods->sendmessage($chat_id, '
+    <pre>به ربات مشاهده نرخ زنده
 ارزدر بازار آزاد ایران خوش آمدین 🌹
-</pre>');
+    </pre>');
 
         $btn->inlineKeyboards($chat_id, 'ثبت نام', 'createUser', 'لطفا ثبت نام کنید👇 ',);
     } else {
-        $btn->customKeyboard($chat_id, '<pre>
+        $btn->customKeyboard($db, $chat_id, '<pre>
 در این قسمت شما میتوانید با انتخاب
- 
+
  هر ارز قیمت لحظه ای آن را
 
  مشاهده کنید.
- 
-و برای ارسال خودکار قیمت ارز 
 
-میتوانید از قسمت setting ⚙️ ارز خود 
+و برای ارسال خودکار قیمت ارز
 
-را انتخاب کنید  
+میتوانید از قسمت setting ⚙️ ارز خود
+
+را انتخاب کنید
 </pre>');
     }
 }
 
 
 if ($value == 'createUser') {
-    if (isset($chat_id)) {
-        $btn->getPhoneNumber( '<pre>در این قسمت Share Contact را انتخاب کنید تا احراز هویت شما تکمیل شود 
+
+    $language = $methods->getLanguageFirst($db, $chat_id);
+    if ($language == 'ENGLISH') {
+        if (isset($chat_id)) {
+            $btn->getPhoneNumber('<pre>In this section, <b>select Share Contact</b> to complete your authentication
 
 👇
-</pre> ',$chat_id);
+</pre> ', $chat_id);
+        }
+    } elseif ($language == 'PERSIAN') {
+        if (isset($chat_id)) {
+            $btn->getPhoneNumber('<pre>در این قسمت Share Contact را انتخاب کنید تا احراز هویت شما تکمیل شود
+
+👇
+</pre> ', $chat_id);
+        }
     }
 }
 
 if (isset($phone)) {
-    $user->createAcount($db, $chat_id, $username, $phone);
-    $btn->customKeyboard($chat_id, '
+    $language = $methods->getLanguageFirst($db, $chat_id);
+    $user->createAcount($db, $chat_id, $username, $phone, $language);
+
+    if ($language == 'ENGLISH') {
+        $btn->customKeyboard($db, $chat_id, '
 <pre>
              🌹🌹🌼🌹🌹
-               
-سپاس که مارو انتخاب کردین 
+
+Thank you for choosing us
+
+In this section you can choose
+
+Each currency has its current price
+
+view
+
+And to automatically send currency prices
+
+You can change your currency from the SETTING⚙️ section
+
+Choose
+</pre>'
+        );
+    } else if ($language == 'PERSIAN') {
+
+        $btn->customKeyboard($db, $chat_id, '
+<pre>
+             🌹🌹🌼🌹🌹
+
+سپاس که مارو انتخاب کردین
 
 در این قسمت شما میتوانید با انتخاب
- 
+
  هر ارز قیمت لحظه ای آن را
 
  مشاهده کنید.
- 
-و برای ارسال خودکار قیمت ارز 
 
-میتوانید از قسمت setting ⚙️ ارز خود 
+و برای ارسال خودکار قیمت ارز
 
-را انتخاب کنید  
+میتوانید از قسمت setting ⚙️ ارز خود
+
+را انتخاب کنید
 </pre>'
-    );
+        );
+    }
 
 
 }
-
 
 if (isset($chat_id)) {
     $checkUser = $user->checkUserId($db, $chat_id);
@@ -159,7 +245,6 @@ if (isset($checkUser)) {
 
         if ($value == 'USD' || $value == 'EUR' || $value == 'GBP' || $value == 'AUD' || $value == 'setting') {
 
-
             for ($i = 0; $i < count($obj); $i++) {
 
                 if ($obj[$i]['Code'] == $value) {
@@ -167,84 +252,124 @@ if (isset($checkUser)) {
                         if ($rate[$x]['name'] == $value) {
                             $flag = true;
                             if ($obj[$i]['Buy'] > $rate[$x]['buy']) {
-                                $methods->showRateUp($chat_id, $obj, $i);
-                                $getRateId = $user->getUserRates($db,$chat_id);
+
+                                $methods->showRateUp($db, $chat_id, $obj, $i);
+                                $getRateId = $user->getUserRates($db, $chat_id);
                                 $user->updateRate($db, $getRateId[$x]['id'], $obj[$i]['Buy'], $obj[$i]['Sell']);
 
                             } else if ($obj[$i]['Buy'] < $rate[$x]['buy']) {
-                                $methods->showRateDown($chat_id, $obj, $i);
-                                $getRateId = $user->getUserRates($db,$chat_id);
+
+                                $methods->showRateDown($db, $chat_id, $obj, $i);
+                                $getRateId = $user->getUserRates($db, $chat_id);
                                 $user->updateRate($db, $getRateId[$x]['id'], $obj[$i]['Buy'], $obj[$i]['Sell']);
 
                             } else {
-                                $methods->showRate($chat_id, $obj, $i);
-                                $getRateId = $user->getUserRates($db,$chat_id);
+                                $methods->showRate($db, $chat_id, $obj, $i);
+                                $getRateId = $user->getUserRates($db, $chat_id);
                                 $user->updateRate($db, $getRateId[$x]['id'], $obj[$i]['Buy'], $obj[$i]['Sell']);
-
                             }
                         }
-
                     }
                     if (!$flag) {
-                        $methods->showRate($chat_id, $obj, $i);
+                        $methods->showRate($db, $chat_id, $obj, $i);
                     }
                 }
-
             }
         }
-
     }
 }
 
-if ($value == 'setting') {
-    $btn->SettingradioButton($db, $chat_id, '<b><i> انتخاب ارز 👇</i></b>');
+if ($value == 'setting' || $value == 'تنظیمات') {
+    $btn->SettingradioButton($db, $chat_id);
 }
 
 if ($value == "AddRate") {
     $button_id = $methods->getButtonId($db);
-    $btn->AddradioButton($db, $chat_id, $button_id, '<b><i>انتخاب✔  و  حذف</i></b>');
+    $language = $methods->getLanguage($db, $chat_id);
+    if ($language == 'ENGLISH') {
+        $btn->AddradioButton($db, $chat_id, $button_id, '<b><i>SELECT✔  OR DELETE</i></b>');
+    } else if ('PERSIAN') {
+        $btn->AddradioButton($db, $chat_id, $button_id, '<b><i>انتخاب✔  و  حذف</i></b>');
+    }
 }
 
 
 if ($value == 'AddUSD' || $value == 'AddEUR' || $value == 'AddGBP' || $value == 'AddAUD') {
 
     $value = str_replace("Add", "", $value);
-
     $sql = "SELECT  `user_id`, `value` FROM `items_users` WHERE `user_id`=$chat_id AND `value`='$value'";
     $stmt = $db->query($sql);
     $config = $stmt->rowCount();
 
     if ($config == 0) {
+
         $sql = "INSERT INTO `items_users`(`user_id`, `value`) VALUES ('$chat_id','$value')";
         $stmt = $db->query($sql);
         $config = $stmt->fetch(PDO::FETCH_ASSOC);
 
     }
     $message_id = $methods->getButtonId($db);
-    $btn->AddradioButton($db, $chat_id, $message_id, '<b><i>انتخاب✔  و  حذف</i></b>');
+    $language = $methods->getLanguage($db, $chat_id);
+    if ($language == 'ENGLISH') {
+        $btn->AddradioButton($db, $chat_id, $button_id, '<b><i>SELECT✔  OR DELETE</i></b>');
+    } else if ('PERSIAN') {
+        $btn->AddradioButton($db, $chat_id, $button_id, '<b><i>انتخاب✔  و  حذف</i></b>');
+    }
 }
 
 if ($value == 'DeleteUSD' || $value == 'DeleteEUR' || $value == 'DeleteGBP' || $value == 'DeleteAUD') {
 
     $value = str_replace("Delete", "", $value);
-
     $sql = "SELECT  `id`,`user_id`, `value` FROM `items_users` WHERE `user_id`=$chat_id AND `value`='$value'";
     $stmt = $db->query($sql);
     $config = $stmt->fetch(PDO::FETCH_ASSOC);
     $id = $config['id'];
 
-        $sql = "DELETE FROM `items_users` WHERE `id` = $id";
-        $stmt = $db->query($sql);
-        $config = $stmt->rowCount();
+    $sql = "DELETE FROM `items_users` WHERE `id` = $id";
+    $stmt = $db->query($sql);
+    $config = $stmt->rowCount();
 
     $message_id = $methods->getButtonId($db);
-    $btn->AddradioButton($db, $chat_id, $message_id, '<b><i>انتخاب✔  و  حذف</i></b>');
+    $language = $methods->getLanguage($db, $chat_id);
+    if ($language == 'ENGLISH') {
+        $btn->AddradioButton($db, $chat_id, $button_id, '<b><i>SELECT✔  OR DELETE</i></b>');
+    } else if ('PERSIAN') {
+        $btn->AddradioButton($db, $chat_id, $button_id, '<b><i>انتخاب✔  و  حذف</i></b>');
+    }
+}
+
+if ($value == 'Selecting Language') {
+
+    $button_id = $methods->getButtonId($db);
+    $language = $methods->getLanguage($db, $chat_id);
+    if ($language == 'ENGLISH') {
+        $btn->selectLanguage($chat_id, '<pre>Please select your language</pre>', $button_id);
+    } else if ('PERSIAN') {
+        $btn->selectLanguage($chat_id, '<pre>لطفا زبان خودرا انتخاب کنید</pre>', $button_id);
+    }
+}
+
+if ($value == 'AddENGLISH' || $value == 'AddPERSIAN') {
+    $methods = new methods();
+
+    $value = str_replace("Add", "", $value);
+    $updateLanguage = $methods->updateLanguage($db, $chat_id, $value);
+
+    if ($updateLanguage == 1) {
+        $id = $methods->getButtonId($db);
+        $btn->languageNotif($db, $chat_id, $id);
+        $language = $methods->getLanguage($db, $chat_id);
+        if ($language == 'ENGLISH') {
+            $btn->customKeyboard($db, $chat_id, 'ENGLISH');
+        } else if ($language == 'PERSIAN') {
+            $btn->customKeyboard($db, $chat_id, 'فارسی');
+        }
+    }
 }
 
 
-//
-//
-//
+
+
 //if (isset($chat_id)) {
 //    $checkUser = $user->checkUserId($db, $chat_id);
 //}

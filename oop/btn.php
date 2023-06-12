@@ -9,6 +9,7 @@ include_once('methods.php');
 class btn
 {
 
+
     public function inlineKeyboards($chat_id, $text, $callback_data, $message)
     {
 
@@ -35,15 +36,22 @@ class btn
 
     }
 
-    public function customKeyboard($chat_id, $message)
+    public function customKeyboard($db,$chat_id, $message)
     {
+        $methods = new methods();
+        $language=$methods->getLanguage($db,$chat_id);
 
 
         $btn1 = "USD";
         $btn2 = "EUR";
         $btn3 = "GBP";
         $btn4 = "AUD";
-        $setting = "setting⚙️";
+        if($language == 'ENGLISH'){
+            $setting = "setting⚙️";
+        }else if('PERSIAN'){
+            $setting = "تنظیمات⚙️";
+        }
+
 
         $keyboard = [
 
@@ -57,10 +65,10 @@ class btn
         ];
 
         $encodedKeyboard = json_encode($keyboard);
-        $open = $message;
+
         bot('sendMessage', [
             'chat_id' => $chat_id,
-            'text' => $open,
+            'text' => $message,
             'reply_markup' => $encodedKeyboard,
             'parse_mode' => 'html',
 
@@ -70,8 +78,6 @@ class btn
     public function getPhoneNumber($text, $chat_id)
     {
 
-
-// The keyboard with the "Share Contact" button
         $reply_markup = json_encode([
             'keyboard' => [
                 [
@@ -110,7 +116,7 @@ class btn
         $callback_data4 = "AddAUD";
 
         $user = new users();
-        $rate = $user->getUserRates($db,$chat_id);
+        $rate = $user->getUserRates($db, $chat_id);
         foreach ($rate as $item) {
             if ($item['name'] == 'USD') {
                 $btn1 = "USD✔️";
@@ -152,19 +158,31 @@ class btn
             'chat_id' => $chat_id,
             'message_id' => $message_id,
             'reply_markup' => $keyboard,
-             'parse_mode' => 'html'
+            'parse_mode' => 'html'
         ]);
 
     }
 
-    public function SettingradioButton($db, $chat_id, $text)
+    public function SettingradioButton($db, $chat_id)
     {
         $methods = new methods();
-        $btn1 = "انتخاب";
+        $language = $methods->getLanguage($db, $chat_id);
+
+        if ($language == 'ENGLISH') {
+            $btn1 = "select";
+            $btn2 = "select Language";
+            $text = "SETTING";
+        } else {
+            $btn1 = "انتخاب";
+            $btn2 = "انتخاب زبان";
+            $text = 'تنظیمات';
+        }
+
         $keyboard = json_encode([
             "inline_keyboard" => [
                 [
                     ['text' => $btn1, 'callback_data' => 'AddRate'],
+                    ['text' => $btn2, 'callback_data' => 'Selecting Language'],
                 ],
 
             ]
@@ -177,11 +195,90 @@ class btn
             'reply_markup' => $keyboard,
             'parse_mode' => 'html',
         ]);
-        $methods->updateButtonId($db, $data->result->message_id);
+        $methods->updateButtonIdSetting($db, $data->result->message_id);
     }
 
-    public function DeleteRadioButton($db, $id)
+    public function selectLanguage($chat_id, $text, $message_id)
     {
+        $btn1 = "ENGLISH";
+        $btn2 = "فارسی";
 
+        $callback_data1 = "AddENGLISH";
+        $callback_data2 = "AddPERSIAN";
+
+
+        $keyboard = json_encode([
+            "inline_keyboard" => [
+                [
+                    ['text' => $btn1, 'callback_data' => $callback_data1],
+                    ['text' => $btn2, 'callback_data' => $callback_data2],
+                ]
+            ]
+        ]);
+
+        bot('editMessageText', [
+            'chat_id' => $chat_id,
+            'text' => $text,
+            'message_id' => $message_id,
+            'parse_mode' => 'html'
+        ]);
+        bot('editMessageReplyMarkup', [
+            'chat_id' => $chat_id,
+            'message_id' => $message_id,
+            'reply_markup' => $keyboard,
+            'parse_mode' => 'html'
+        ]);
+
+    }
+
+    public function languageNotif($db, $chat_id, $message_id)
+    {
+        $methods = new methods();
+        $language = $methods->getLanguage($db, $chat_id);
+        if ($language == 'ENGLISH') {
+            $text = "Changes applied successfully";
+        } else if ($language == 'PERSIAN') {
+            $text = "تغییرات با موفیت اعمال شد";
+        }
+
+       bot('editMessageText', [
+            'chat_id' => $chat_id,
+            'text' => $text,
+            'message_id' => $message_id,
+            'parse_mode' => 'html'
+        ]);
+
+    }
+
+    public function selectLanguageFirst($db, $chat_id)
+    {
+        $methods = new methods();
+        $language = $methods->getLanguage($db, $chat_id);
+        $text = "<pre>Please Select Your Language
+
+لطفا زبان خود را انتخاب کنید
+</pre>";
+
+        $btn1 = "ENGLISH";
+        $btn2 = "فارسی";
+
+
+        $keyboard = json_encode([
+            "inline_keyboard" => [
+                [
+                    ['text' => $btn1, 'callback_data' => 'firstENGLISH'],
+                    ['text' => $btn2, 'callback_data' => 'firstPERSIAN'],
+                ],
+
+            ]
+        ]);
+
+
+        $data = bot('sendMessage', [
+            'chat_id' => $chat_id,
+            'text' => $text,
+            'reply_markup' => $keyboard,
+            'parse_mode' => 'html',
+        ]);
     }
 }

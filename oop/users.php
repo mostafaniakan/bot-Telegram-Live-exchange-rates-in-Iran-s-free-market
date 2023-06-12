@@ -15,9 +15,9 @@ class users
         return $config;
     }
 
-    public function createAcount($db, $chat_id, $username, $phones,)
+    public function createAcount($db, $chat_id, $username, $phones,$language)
     {
-        $sql = "INSERT INTO users (users_id, name,phones) VALUES ('$chat_id','$username','$phones')";
+        $sql = "INSERT INTO `users`(`users_id`, `name`, `phones`, `Language`) VALUES ('$chat_id','$username','$phones','$language')";
         $stmt = $db->query($sql);
         $stmt->rowCount();
     }
