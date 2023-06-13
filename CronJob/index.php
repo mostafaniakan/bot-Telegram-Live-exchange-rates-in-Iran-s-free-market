@@ -12,7 +12,7 @@ include_once('../oop/users.php');
 set_time_limit(0);
 ob_start();
 const token = "6135478668:AAGOHriJ3vZl0XaDy-DlxzjzVxodqhn5hdQ";
-$webhook_url = 'https://558f-185-107-81-154.ngrok-free.app';
+$webhook_url = 'https://fd00-185-107-81-138.ngrok-free.app';
 $db = $db;
 $obj = $obj;
 
@@ -54,6 +54,9 @@ curl_close($ch);
 if (php_sapi_name() == 'cli-server') {
     $update = file_get_contents('php://input');
 }
+
+
+
 
 
 $sql = "SELECT `users_id` FROM `users`";

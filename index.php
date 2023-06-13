@@ -29,7 +29,7 @@ file_put_contents('data.json', $update);
 $data = json_decode($update);
 
 const token = "6135478668:AAGOHriJ3vZl0XaDy-DlxzjzVxodqhn5hdQ";
-$webhook_url = 'https://558f-185-107-81-154.ngrok-free.app';
+$webhook_url = 'https://fd00-185-107-81-138.ngrok-free.app';
 
 //config bot
 function bot($method, $datas = [])
@@ -46,10 +46,8 @@ function bot($method, $datas = [])
 }
 
 
-
-
 //set webhook
-$url = "https://api.telegram.org/bot".token."/setWebhook?url=$webhook_url";
+$url = "https://api.telegram.org/bot" . token . "/setWebhook?url=$webhook_url";
 
 $ch = curl_init();
 curl_setopt($ch, CURLOPT_URL, $url);
@@ -107,10 +105,32 @@ if (isset($data->message->contact->phone_number)) {
     $phone = $data->message->contact->phone_number;
 }
 
+
+//if (isset($data->my_chat_member->chat->id)) {
+//    $channelId = $data->my_chat_member->chat->id;
+//    $channelName = $data->my_chat_member->chat->username;
+//
+//    $methods->insertChannel($db, $channelId, $channelName);
+//
+//    $rate = ['USD', 'EUR', 'GBP', 'AUD'];
+//
+//    foreach ($rate as $item) {
+//      print_r($item);
+//    }
+//
+//}
+//if(isset($data->my_chat_member->new_chat_member->status)){
+//    $status=$data->my_chat_member->new_chat_member->status;
+//}
+//if($status == 'left' || $status == 'kicked'){
+//$methods->deleteChannel($db,$channelId);
+//}
+
+
+
 //set webhook
-
 if ($value == '/start') {
-
+    channel();
     $userID = $user->checkUserId($db, $chat_id);
     if ($userID == 0) {
         $language = $methods->getLanguageFirst($db, $chat_id);

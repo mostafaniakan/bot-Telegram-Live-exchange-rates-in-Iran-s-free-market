@@ -160,4 +160,17 @@ class methods
         return $config['language'];
     }
 
+//    channel
+
+public function insertChannel($db,$channel_id,$channel_name){
+        $query="INSERT INTO `chanels`(`name`, `channel_id`) VALUES ('$channel_name','$channel_id')";
+        $stmt=$db->query($query);
+        $config=$stmt->rowCount();
+}
+public function deleteChannel($db,$channel_id){
+        $query="DELETE FROM `chanels` WHERE `channel_id`='$channel_id'";
+        $stmt=$db->query($query);
+        $config=$stmt->rowCount();
+        return $config;
+}
 }
