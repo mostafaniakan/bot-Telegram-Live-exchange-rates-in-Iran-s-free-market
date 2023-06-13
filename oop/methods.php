@@ -168,9 +168,14 @@ public function insertChannel($db,$channel_id,$channel_name){
         $config=$stmt->rowCount();
 }
 public function deleteChannel($db,$channel_id){
-        $query="DELETE FROM `chanels` WHERE `channel_id`='$channel_id'";
+        $query="DELETE FROM `chanels` WHERE `channel_id`=$channel_id";
         $stmt=$db->query($query);
-        $config=$stmt->rowCount();
-        return $config;
+    return $stmt->rowCount();
 }
+public function getChannel($db,$channel_id){
+        $query="SELECT `name`, `channel_id` FROM `chanels` WHERE `channel_id`='$channel_id'";
+        $stmt=$db->query($query);
+    return $stmt->fetch(PDO::FETCH_ASSOC);
+}
+
 }

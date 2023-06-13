@@ -28,8 +28,8 @@ file_put_contents('data.json', $update);
 
 $data = json_decode($update);
 
-const token = "6135478668:AAGOHriJ3vZl0XaDy-DlxzjzVxodqhn5hdQ";
-$webhook_url = 'https://fd00-185-107-81-138.ngrok-free.app';
+const token = "6186515390:AAFS1nPB-WhTE5HSxQf1ETPo4FZtFGfkHPA";
+$webhook_url = 'https://abb1-185-107-81-150.ngrok-free.app';
 
 //config bot
 function bot($method, $datas = [])
@@ -55,11 +55,11 @@ curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 
 $result = curl_exec($ch);
 
-if ($result === false) {
-    echo 'Error: ' . curl_error($ch);
-} else {
-    echo 'Webhook set up successfully';
-}
+//if ($result === false) {
+//    echo 'Error: ' . curl_error($ch);
+//} else {
+//    echo 'Webhook set up successfully';
+//}
 curl_close($ch);
 
 if (php_sapi_name() == 'cli-server') {
@@ -106,31 +106,65 @@ if (isset($data->message->contact->phone_number)) {
 }
 
 
-//if (isset($data->my_chat_member->chat->id)) {
-//    $channelId = $data->my_chat_member->chat->id;
-//    $channelName = $data->my_chat_member->chat->username;
-//
-//    $methods->insertChannel($db, $channelId, $channelName);
-//
-//    $rate = ['USD', 'EUR', 'GBP', 'AUD'];
-//
-//    foreach ($rate as $item) {
-//      print_r($item);
-//    }
-//
-//}
-//if(isset($data->my_chat_member->new_chat_member->status)){
-//    $status=$data->my_chat_member->new_chat_member->status;
-//}
-//if($status == 'left' || $status == 'kicked'){
-//$methods->deleteChannel($db,$channelId);
-//}
+////channel
+$status = "";
+if (isset($data->my_chat_member->chat->id)) {
+    $channelId = $data->my_chat_member->chat->id;
+    $channelName = $data->my_chat_member->chat->username;
+    $getChannel = $methods->getChannel($db, $channelId);
 
+    if ($getChannel == null) {
+            $methods->insertChannel($db, $channelId, $channelName);
+    }
+
+    $methods->sendmessage($channelId, '<pre>
+به ربات CurrencyScan خوش امدین 
+برا استفاده از ربات شما باید
+فرمت زیر را رعایت کنید به عنوان مثال
+             bot_USD
+             
+</pre>');
+}
+
+
+if (isset($data->channel_post->sender_chat->id)) {
+    $channelId = $data->channel_post->sender_chat->id;
+}
+
+if (isset($data->my_chat_member->new_chat_member->status)) {
+    $status = $data->my_chat_member->new_chat_member->status;
+}
+
+if ($status == 'left' || $status == 'kicked') {
+
+    $methods->deleteChannel($db, $channelId);
+}
+
+$channelMessage = "";
+if (isset($data->channel_post->text)) {
+    $channelMessage = $data->channel_post->text;
+}
+$channelMessage = strtoupper($channelMessage);
+
+if (strpos($channelMessage, "BOT_") !== false) {
+
+    $value = str_replace("BOT_", "", $channelMessage);
+
+    $flag=false;
+    foreach ($obj as $item) {
+        if ($item['Code'] == $value) {
+            $flag=true;
+            $methods->sendmessage($channelId, 'NAME : ' . $item['Code'] . "=>" . 'BUY : ' . $item['Buy'] . "=>" . 'SELL : ' . $item['Sell']);
+        }
+    }
+    if(!$flag){
+        $methods->sendmessage($channelId,'NOT FUND');
+    }
+}
 
 
 //set webhook
 if ($value == '/start') {
-    channel();
     $userID = $user->checkUserId($db, $chat_id);
     if ($userID == 0) {
         $language = $methods->getLanguageFirst($db, $chat_id);
