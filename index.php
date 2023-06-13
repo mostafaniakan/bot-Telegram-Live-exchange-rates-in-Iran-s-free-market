@@ -29,7 +29,7 @@ file_put_contents('data.json', $update);
 $data = json_decode($update);
 
 const token = "6186515390:AAFS1nPB-WhTE5HSxQf1ETPo4FZtFGfkHPA";
-$webhook_url = 'https://abb1-185-107-81-150.ngrok-free.app';
+
 
 //config bot
 function bot($method, $datas = [])
@@ -45,26 +45,6 @@ function bot($method, $datas = [])
     return $dataBot;
 }
 
-
-//set webhook
-$url = "https://api.telegram.org/bot" . token . "/setWebhook?url=$webhook_url";
-
-$ch = curl_init();
-curl_setopt($ch, CURLOPT_URL, $url);
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-
-$result = curl_exec($ch);
-
-//if ($result === false) {
-//    echo 'Error: ' . curl_error($ch);
-//} else {
-//    echo 'Webhook set up successfully';
-//}
-curl_close($ch);
-
-if (php_sapi_name() == 'cli-server') {
-    $update = file_get_contents('php://input');
-}
 
 
 //get user id
